@@ -32,12 +32,9 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
             if (moveValue >= bestMoveValue) {
                 bestMoveValue = moveValue;
                 nextMove = _move;
-
             }
 
         }
-           
-       
 		return nextMove;
 	}
 
@@ -67,47 +64,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
         }
 }
 
-    // public int maxValue (int depth, GameState currentState, int alpha, int beta) {
-    //     AbstractSet<Square> possibleMoves = currentState.getValidMoves();
-	// 	if(depth == depthLimit || possibleMoves.size() == 0) {
-	// 		return staticEvaluator(currentState);
-	// 	}
-        
-    //     int v = Integer.MIN_VALUE;
-    //     for(Square _move: possibleMoves) {
-    //         v = Integer.max(v, minValue(depth - 1, currentState.applyMove(_move), alpha, beta));
-    //         if ( v >= beta) return v;
-    //         alpha = Integer.max(alpha, v);
-    //     }
-
-    //     return v;
-    // }
-    
-    // public int minValue (int depth, GameState currentState, int alpha, int beta) {
-    //     AbstractSet<Square> possibleMoves = currentState.getValidMoves();
-	// 	if(depth == depthLimit || possibleMoves.size() == 0) {
-	// 		return staticEvaluator(currentState);
-	// 	}
-
-    //     int v = Integer.MAX_VALUE;
-    //     for(Square _move: possibleMoves) {
-    //         v = Integer.min(v, maxValue(depth - 1, currentState.applyMove(_move), alpha, beta));
-    //         if ( v <= alpha) return v;
-    //         beta = Integer.min(beta, v);
-    //     }
-    //     return v;
-    // }
-
-	
-	 /**
-     * The static evaluation function for your search.  This function
-     * must be used by your MiniMax and AlphaBeta algorithms for all
-     * static evaluations.  It is separated out so that it can be easily
-     * altered for grading purposes.
-     * 
-     * @param state the state to be evaluated.
-     * @return an integer score for the value of the state to the max player.
-     */
+  
 	@Override
 	public int staticEvaluator(GameState state) {
 		staticEvaluationsComputed++;
@@ -123,22 +80,37 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
 		 * Mark a high score for the spaces in the corners and on the side - Especially corners: Mark it for 99? 
 		 * Corner: Using Static Values
 		 * A  B  C  D  E  F  G  H
-		 * 99  50 50 50 50 50 50  99
-		 * 50 -99 20 20 20 20 -99 50				
-		 * 50  20 40 40 40 40 20  50
+		 * 100  50 50 50 50 50 50  100
+		 * 0 -99 20 20 20 20 -99 50				
+		 * 50  20 60 40 40 40 20  0
 		 * 50  20 40 PS PS 40 20  50
 		 * 50  20 40 PS PS 40 20  50
 		 * 50  20 40 40 40 40 20  50
-		 * 50 -99 20 20 20 20 -99 50
-		 * 99  50 50 50 50 50 50  99
+		 * 0 -99 20 20 20 20 -100 0
+		 * 100  0 50 50 50 50 0  100
 		 * result
 		 * Mobility: 
 		 * The more moves you have the better the reverse is applied for the opponent:
-		 * result = youValidMoves - opponentValidMoves
+		 * result += (youValidMoves - opponentValidMoves)*20
 		 * 
 		 */
+		int h_score = state.getScore(state.getCurrentPlayer()) * 5;
+		int[][] pqBoard =
+			 	{{400, -100, 60, 50, 50, 60, -100, 400},
+				 {-100, -150, 20 ,20, 20 ,20, -150, -100},
+				 {60,  20, 40, 40, 40, 40, 20, 60},
+				 {50,  20, 40, 40, 40, 40, 20, 50},
+				 {50,  20, 40, 40, 40, 40, 20, 50},
+				 {60,  20, 40, 40, 40, 40, 20, 60},
+				 {-100, -150, 20, 20, 20, 20, -150, -100},
+				 {400, -100, 50, 50, 50, 50, -100,  400}};
+		int score_of_move = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
+		h_score += score_of_move; 
 		
-		 return state.getScore(state.getCurrentPlayer());
+		AbstractSet<Square> myPossibleMoves = state.getValidMoves(state.getCurrentPlayer());
+		AbstractSet<Square> opponentPossibleMoves = state.getValidMoves(state.getOpponent(state.getCurrentPlayer()));
+		h_score += (myPossibleMoves.size() - opponentPossibleMoves.size())*15;
+		return h_score;
 	}
 	 /**
      * Get the number of static evaluations that were

@@ -82,22 +82,37 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
 		 * Mark a high score for the spaces in the corners and on the side - Especially corners: Mark it for 99? 
 		 * Corner: Using Static Values
 		 * A  B  C  D  E  F  G  H
-		 * 99  50 50 50 50 50 50  99
-		 * 50 -99 20 20 20 20 -99 50				
-		 * 50  20 40 40 40 40 20  50
+		 * 100  50 50 50 50 50 50  100
+		 * 0 -99 20 20 20 20 -99 50				
+		 * 50  20 60 40 40 40 20  0
 		 * 50  20 40 PS PS 40 20  50
 		 * 50  20 40 PS PS 40 20  50
 		 * 50  20 40 40 40 40 20  50
-		 * 50 -99 20 20 20 20 -99 50
-		 * 99  50 50 50 50 50 50  99
+		 * 0 -99 20 20 20 20 -100 0
+		 * 100  0 50 50 50 50 0  100
 		 * result
 		 * Mobility: 
 		 * The more moves you have the better the reverse is applied for the opponent:
-		 * result = youValidMoves - opponentValidMoves
+		 * result += (youValidMoves - opponentValidMoves)*20
 		 * 
 		 */
+		int h_score = state.getScore(state.getCurrentPlayer()) * 5;
+		int[][] pqBoard =
+			 	{{400, -100, 60, 50, 50, 60, -100, 400},
+				 {-100, -150, 20 ,20, 20 ,20, -150, -100},
+				 {60,  20, 40, 40, 40, 40, 20, 60},
+				 {50,  20, 40, 40, 40, 40, 20, 50},
+				 {50,  20, 40, 40, 40, 40, 20, 50},
+				 {60,  20, 40, 40, 40, 40, 20, 60},
+				 {-100, -150, 20, 20, 20, 20, -150, -100},
+				 {400, -100, 50, 50, 50, 50, -100,  400}};
+		int score_of_move = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
+		h_score += score_of_move; 
 		
-		 return state.getScore(state.getCurrentPlayer());
+		AbstractSet<Square> myPossibleMoves = state.getValidMoves(state.getCurrentPlayer());
+		AbstractSet<Square> opponentPossibleMoves = state.getValidMoves(state.getOpponent(state.getCurrentPlayer()));
+		h_score += (myPossibleMoves.size() - opponentPossibleMoves.size())*15;
+		return h_score;
 	}
 	 /**
      * Get the number of static evaluations that were
