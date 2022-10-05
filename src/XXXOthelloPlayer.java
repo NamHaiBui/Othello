@@ -1,19 +1,21 @@
-import java.util.AbstractSet;
+
 import java.util.Date;
 
 
-public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
+public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
 	private int depthLimit;
-	private int AveBranchingFactor = 1;
-	private int branchingFactor = 1;
 	private int generatedNodes = 1;
-	private int staticEvaluationsComputed = 0;
+	private int branchingFactor = 1;
+	private int AveBranchingFactor = 1;
 	
-	public ABOthelloPlayer(String name) {
+	private int staticEvaluationsComputed = 0;
+
+	
+	public XXXOthelloPlayer(String name) {
 		super(name);
 		depthLimit = 5;
 	}
-	public ABOthelloPlayer(String name, int _depthLimit) {
+	public XXXOthelloPlayer(String name, int _depthLimit) {
 		super(name);
 		depthLimit = _depthLimit;
 	}
@@ -21,7 +23,6 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
 	@Override
 	public Square getMove(GameState currentState, Date deadline) {
         Square moves[] = currentState.getValidMoves().toArray(new Square[0]);
-        generatedNodes += moves.length;
         int nextMoveScore = Integer.MIN_VALUE;
         Square nextMove = null;
         for (Square _move: moves) {
@@ -39,7 +40,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
 
     public int alphaBeta (int depth, GameState currentState, int alpha, int beta, boolean isMax) {
     	Square possibleMoves[] = currentState.getValidMoves().toArray(new Square[0]);
-    	AveBranchingFactor += 1;
+    	AveBranchingFactor+= 1;
         if (depth == 0 || currentState.getStatus() ==  GameState.GameStatus.PLAYING) {
             return staticEvaluator(currentState);
         }
@@ -50,6 +51,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
                 v = Integer.max(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, false));
                 if ( v >= beta) break;
                 alpha = Integer.max(alpha, v);
+                branchingFactor++;
             }
             return v;
 
@@ -58,9 +60,9 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
             for (Square _move: possibleMoves) {
             	generatedNodes++;
                 v = Integer.min(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, true));
-                
                 if ( v <= alpha) break;
                 beta = Integer.min(beta, v);
+                branchingFactor++;
             }
             return v;      
         }
@@ -69,40 +71,39 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
   
 	@Override
 	public int staticEvaluator(GameState state) {
-//		staticEvaluationsComputed++;
-//		int myScore = state.getScore(state.getCurrentPlayer());
-//		int opponentScore = state.getScore(state.getOpponent(state.getCurrentPlayer()));
-//		int h_score = 100*(myScore - opponentScore)/(myScore + opponentScore);
-//		
-//		//mobility
-//		int myPossibleMoves = state.getValidMoves(state.getCurrentPlayer()).size();
-//		int opponentPossibleMoves = state.getValidMoves(state.getOpponent(state.getCurrentPlayer())).size();
-//		if((myPossibleMoves + opponentPossibleMoves) != 0 ) {
-//			h_score += ((myPossibleMoves - opponentPossibleMoves)/(myPossibleMoves + opponentPossibleMoves))*100;
-//		} else {
-//			h_score += 0;
-//		}
-		// Corner Capture + Flank
-//		int[][] pqBoard =
-//			 	{{500, -100, 60, 50, 50, 60, -100, 500},
-//				 {-100, -250, -20 ,-20, -20 ,-20, -250, -100},
-//				 {60,  -20, 100, 40, 40, 100, -20, 60},
-//				 {30,  -20, 40, 40, 40, 40, -20, 30},
-//				 {30,  -20, 40, 40, 40, 40, -20, 30},
-//				 {60,  -20, 100, 40, 40, 100, -20, 60},
-//				 {-100, -250, -20, -20, -20, -20, -250, -100},
-//				 {500, -100, 60, 30, 30, 60, -100,  500}};
-//
-//		int valueOfMove = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
-//		h_score += valueOfMove;
-		return state.getScore(state.getCurrentPlayer());
-//		return h_score;
+		staticEvaluationsComputed++;
+		int myScore = state.getScore(state.getCurrentPlayer());
+		int opponentScore = state.getScore(state.getOpponent(state.getCurrentPlayer()));
+		int h_score = 50*(myScore - opponentScore)/(myScore + opponentScore);
+		
+		//mobility
+		int myPossibleMoves = state.getValidMoves(state.getCurrentPlayer()).size();
+		int opponentPossibleMoves = state.getValidMoves(state.getOpponent(state.getCurrentPlayer())).size();
+		if((myPossibleMoves + opponentPossibleMoves) != 0 ) {
+			h_score += 10*((myPossibleMoves - opponentPossibleMoves)/(myPossibleMoves + opponentPossibleMoves));
+		} else {
+			h_score += 0;
+		}
+		// Corner Capture + Flank Risk
+		int[][] pqBoard =
+			 	{{500, -100, 100, 50, 50, 100, -100, 500},
+				 {-100, -200, -30 ,-30, -30 ,-30, -200, -100},
+				 {100,  -30, 80, 40, 40, 80, -30, 100},
+				 {50,  -30, 40, 0, 0, 40, -30, 50},
+				 {50,  -30, 40, 0, 0, 40, -30, 50},
+				 {100,  -30, 80, 40, 40, 80, -30, 100},
+				 {-100, -200, -30, -30, -30, -30, -200, -100},
+				 {500, -100, 100, 50, 50, 80, -100, 500}};
+
+		int valueOfMove = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
+		h_score += valueOfMove;
+		return h_score;
 	}
-	/**
-     * Get the number of nodes that were generated
-     * during the search.
+	 /**
+     * Get the number of static evaluations that were
+     * performed during the search.
      * 
-     * @return the number of nodes generated.
+     * @return the number of static evaluations performed.
      */
 	@Override
 	public int getNodesGenerated() {
@@ -127,8 +128,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
      */
 	@Override
 	public double getAveBranchingFactor() {
-		double res = generatedNodes/AveBranchingFactor;
-		return res;
+		return generatedNodes/AveBranchingFactor;
 	}
 	 /**
      * Get the effective branching factor of the nodes that were
@@ -142,8 +142,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
      */
 	@Override
 	public double getEffectiveBranchingFactor() {
-		double res = generatedNodes/branchingFactor;
-		return res;
+		return generatedNodes/branchingFactor;
 	}
 	
 	

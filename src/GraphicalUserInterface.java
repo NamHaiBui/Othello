@@ -229,7 +229,8 @@ public class GraphicalUserInterface extends JFrame implements UserInterface, Log
             else if (source instanceof Exception)
                 attributes = err;
             try {
-//                insertString(logArea.getText().length(), message, attributes);
+                insertString(0, message, attributes);
+                
             }
             catch (Exception e) {
                 e.printStackTrace();
