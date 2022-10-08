@@ -3,75 +3,156 @@ import java.util.Date;
 
 
 public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
+	// This field set our maximum depth limit.
 	private int depthLimit;
+	// initialize the number of generated nodes : integer.
 	private int generatedNodes = 1;
-	private int branchingFactor = 1;
-	private int AveBranchingFactor = 1;
-	
+	// initialize the number of explored nodes : integer.
+	private int exploredNodes = 1;
+	// initialize the number of Non Terminal nodes: integer.
+	private int numNonTerminal = 1;
+	// initialize the number of static Evaluations has been computed : integer.
 	private int staticEvaluationsComputed = 0;
+	// initialize the number of AveBranchingFactor : double.
+	private double AveBranchingFactor = 1;
+	// initialize the number of effective branchingFactor : double.
+	private double branchingFactor = 1;
 
+	// initialize the counter for time remained
+	private long msLeft;
+
+
+	// This constant defines the minimum time (ms) that have to remain so that we don't abort the search.
+	private final long ABORT_TIME_THRESHOLD = 100;
 	
+
+	// Constructor for MniMax Player. Initial depth limit is set to a constant.
 	public XXXOthelloPlayer(String name) {
 		super(name);
 		depthLimit = 5;
 	}
+		// Constructor for MiniMax Player with given depth limit.
 	public XXXOthelloPlayer(String name, int _depthLimit) {
 		super(name);
 		depthLimit = _depthLimit;
 	}
 
+	/**
+     * The getMove function for this player.  This function
+     * will return the best move.
+     * 
+     * @param currentState the current state of the board.
+	 * @param deadline the anticipated time to finish play.
+     * @return the Square whose best move is calculated.
+     */
+
 	@Override
 	public Square getMove(GameState currentState, Date deadline) {
         Square moves[] = currentState.getValidMoves().toArray(new Square[0]);
-        int nextMoveScore = Integer.MIN_VALUE;
+        
+        // This store the best move value of the current board.
+		int bestValue = Integer.MIN_VALUE;
+		// This store the next move
         Square nextMove = null;
+
         for (Square _move: moves) {
-            int moveValue = alphaBeta(depthLimit, currentState.applyMove(_move), Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+            generatedNodes++;
+            
+            // We want the role of MAX Player, so we want to find all the MIN child -> isMAX is false.
+            int moveValue = alphaBeta(depthLimit, currentState.applyMove(_move), Integer.MIN_VALUE, Integer.MAX_VALUE, false, deadline);
 
-            if (moveValue > nextMoveScore) {
-            	nextMoveScore = moveValue;
+            if (moveValue > bestValue) {
+            	bestValue = moveValue;
                 nextMove = _move;
-            }
-
+            };
         }
 		return nextMove;
 	}
 
+	/**
+     * The time checks whether we are near out of time and thus soon return a move 
+	 * regardless of the depth.
+     * 
+     * 
+     * @return true if everything is ok.
+     */
 
-    public int alphaBeta (int depth, GameState currentState, int alpha, int beta, boolean isMax) {
+	private boolean isTimeOk(long msLeft) {
+		if (msLeft < ABORT_TIME_THRESHOLD) {
+			System.out.println("Running out of Time. Skip to static evaluation.");
+			return false;
+		}
+		return true;
+	}
+
+	//**************************    Alpha-Beta Pruning Search algo ************************* 
+	/**
+     * The getMove function for this player.  This function
+     * will return the best move.
+     * 
+     * @param depth the current depth of the node.
+	 * @param currentState the current state of the board.
+     * @param alpha the value of best alternatives for MAX player along the path.
+     * @param beta the value of best alternatives for MIN player along the path.
+	 * @param isMax if this is the Max Player then true.
+	 * @param deadline the anticipated time to finish play.
+     * @return the int value whose best move is calculated.
+     */
+
+    public int alphaBeta (int depth, GameState currentState, int alpha, int beta, boolean isMax, Date deadline) {
     	Square possibleMoves[] = currentState.getValidMoves().toArray(new Square[0]);
-    	AveBranchingFactor+= 1;
-        if (depth == 0 || currentState.getStatus() ==  GameState.GameStatus.PLAYING) {
-            return staticEvaluator(currentState);
-        }
-        if (isMax) {
+
+		// Time left until deadline
+		long msLeft = deadline.getTime() - System.currentTimeMillis();
+    	
+		// if depth = 0 or node is a terminal node.
+		if(depth == 0 || possibleMoves.length == 0 || !isTimeOk(msLeft)) {
+			return staticEvaluator(currentState);
+		} else { 
+			numNonTerminal += 1; // this node is a non Terminal node.
+			generatedNodes += possibleMoves.length; // the number of child is generated.
+		}
+
+       if (isMax) {
 			int v = Integer.MIN_VALUE;
             for(Square _move: possibleMoves) {
-            	generatedNodes++;
-                v = Integer.max(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, false));
-                if ( v >= beta) break;
+            	exploredNodes++;
+                //Recursively search the new game state
+                v = Integer.max(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, false, deadline));
+                
+                
+                if ( v >= beta) break; // beta cut off
                 alpha = Integer.max(alpha, v);
-                branchingFactor++;
             }
             return v;
 
 		} else {
 			int v = Integer.MAX_VALUE;
             for (Square _move: possibleMoves) {
-            	generatedNodes++;
-                v = Integer.min(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, true));
-                if ( v <= alpha) break;
+            	exploredNodes++;
+                v = Integer.min(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, true, deadline));
+                
+                if ( v <= alpha) break; // alpha cut off
                 beta = Integer.min(beta, v);
-                branchingFactor++;
             }
-            return v;      
+            return v;       
         }
 }
-
+ /**
+     * The static evaluation function for your search.  This function
+     * must be used by your MiniMax and AlphaBeta algorithms for all
+     * static evaluations.  It is separated out so that it can be easily
+     * altered for grading purposes.
+     * 
+     * @param state the state to be evaluated.
+     * @return an integer score for the value of the state to the max player.
+     */
   
 	@Override
 	public int staticEvaluator(GameState state) {
 		staticEvaluationsComputed++;
+
+
 		int myScore = state.getScore(state.getCurrentPlayer());
 		int opponentScore = state.getScore(state.getOpponent(state.getCurrentPlayer()));
 		int h_score = 50*(myScore - opponentScore)/(myScore + opponentScore);
@@ -93,17 +174,17 @@ public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
 				 {50,  -30, 40, 0, 0, 40, -30, 50},
 				 {100,  -30, 80, 40, 40, 80, -30, 100},
 				 {-100, -200, -30, -30, -30, -30, -200, -100},
-				 {500, -100, 100, 50, 50, 80, -100, 500}};
+				 {500, -100, 100, 50, 50, 100, -100, 500}};
 
 		int valueOfMove = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
 		h_score += valueOfMove;
 		return h_score;
 	}
 	 /**
-     * Get the number of static evaluations that were
-     * performed during the search.
+     * Get the number of nodes that were generated
+     * during the search.
      * 
-     * @return the number of static evaluations performed.
+     * @return the number of nodes generated.
      */
 	@Override
 	public int getNodesGenerated() {
@@ -128,7 +209,9 @@ public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
      */
 	@Override
 	public double getAveBranchingFactor() {
-		return generatedNodes/AveBranchingFactor;
+		// formula: mean b = # non of root nodes / # of non terminal nodes
+		AveBranchingFactor = (generatedNodes - 1) / numNonTerminal;  // Minus 1 is minus the root
+		return AveBranchingFactor;
 	}
 	 /**
      * Get the effective branching factor of the nodes that were
@@ -142,7 +225,9 @@ public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
      */
 	@Override
 	public double getEffectiveBranchingFactor() {
-		return generatedNodes/branchingFactor;
+		// formula: b = # explored nodes / # of non terminal nodes
+		branchingFactor = (exploredNodes - 1) /numNonTerminal; // Minus 1 is minus the root
+		return branchingFactor;
 	}
 	
 	
