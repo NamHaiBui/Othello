@@ -2,7 +2,7 @@
 import java.util.Date;
 
 
-public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
+public class NTOthelloPlayer extends OthelloPlayer implements MiniMax{
 	// This field set our maximum depth limit.
 	private int depthLimit;
 	// initialize the number of generated nodes : integer.
@@ -27,12 +27,12 @@ public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
 	
 
 	// Constructor for MniMax Player. Initial depth limit is set to a constant.
-	public XXXOthelloPlayer(String name) {
+	public NTOthelloPlayer(String name) {
 		super(name);
 		depthLimit = 5;
 	}
 		// Constructor for MiniMax Player with given depth limit.
-	public XXXOthelloPlayer(String name, int _depthLimit) {
+	public NTOthelloPlayer(String name, int _depthLimit) {
 		super(name);
 		depthLimit = _depthLimit;
 	}
@@ -154,30 +154,30 @@ public class XXXOthelloPlayer extends OthelloPlayer implements MiniMax{
 
 
 		int myScore = state.getScore(state.getCurrentPlayer());
-		int opponentScore = state.getScore(state.getOpponent(state.getCurrentPlayer()));
-		int h_score = 50*(myScore - opponentScore)/(myScore + opponentScore);
+		int h_score = myScore*50;
 		
 		//mobility
 		int myPossibleMoves = state.getValidMoves(state.getCurrentPlayer()).size();
 		int opponentPossibleMoves = state.getValidMoves(state.getOpponent(state.getCurrentPlayer())).size();
-		if((myPossibleMoves + opponentPossibleMoves) != 0 ) {
-			h_score += 10*((myPossibleMoves - opponentPossibleMoves)/(myPossibleMoves + opponentPossibleMoves));
-		} else {
-			h_score += 0;
-		}
+		h_score += 100*((myPossibleMoves - opponentPossibleMoves)/(myPossibleMoves + opponentPossibleMoves + 1));
+
 		// Corner Capture + Flank Risk
 		int[][] pqBoard =
-			 	{{500, -100, 100, 50, 50, 100, -100, 500},
-				 {-100, -200, -30 ,-30, -30 ,-30, -200, -100},
-				 {100,  -30, 80, 40, 40, 80, -30, 100},
-				 {50,  -30, 40, 0, 0, 40, -30, 50},
-				 {50,  -30, 40, 0, 0, 40, -30, 50},
-				 {100,  -30, 80, 40, 40, 80, -30, 100},
-				 {-100, -200, -30, -30, -30, -30, -200, -100},
-				 {500, -100, 100, 50, 50, 100, -100, 500}};
-
-		int valueOfMove = pqBoard[state.getPreviousMove().getRow()][state.getPreviousMove().getCol()];
-		h_score += valueOfMove;
+			 	{{400, -300, 200, 200, 200, 200, -300, 400},
+				 {-300, -400, -100 ,-100, -100 ,-100, -200, -300},
+				 {200,  -100, 100, 0, 0, 100, -100, 200},
+				 {200,  -100, 0, 100, 100, 0, -100, 200},
+				 {200,  -100, 0, 100, 100, 0, -100, 200},
+				 {200,  -100, 100, 0, 0, 100, -100, 200},
+				 {-300, -400, -100, -100, -100, -100, -400, -300},
+				 {400, -300, 200, 200, 200, 200, -300, 400}};
+		for( int i = 0; i < 8; i ++ ) {
+			for (int j = 0; j < 8; j++) {
+				if(state.getSquare(i, j) == state.getCurrentPlayer()) {
+					h_score += pqBoard[i][j];
+				}
+			}
+		}
 		return h_score;
 	}
 	 /**
