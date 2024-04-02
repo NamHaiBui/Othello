@@ -1,5 +1,3 @@
-// package edu.drexel.cs.ai.othello;
-
 import java.util.*;
 import java.math.BigInteger;
 //import java.security.SecureRandom;
@@ -8,9 +6,6 @@ import java.math.BigInteger;
  * A class for storing all aspects of the game state of Othello, including the
  * board state and current player. This class also includes utilities such as a
  * successor function.
- * 
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
  */
 public class GameState implements Cloneable {
     private Player player;

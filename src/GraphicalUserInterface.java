@@ -1,4 +1,3 @@
-// package edu.drexel.cs.ai.othello;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -8,10 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-/**
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
- */
 public class GraphicalUserInterface extends JFrame implements UserInterface, Logger {
     
     private static final long serialVersionUID = 1;

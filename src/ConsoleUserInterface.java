@@ -2,14 +2,6 @@
 
 import java.util.*;
 import java.io.*;
-
-/**
- * A text-based user interface that allows for execution in a headless
- * environment.
- * 
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
- */
 public class ConsoleUserInterface implements UserInterface {
 
     private OthelloPlayer player1, player2;

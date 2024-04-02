@@ -10,8 +10,7 @@ import java.lang.reflect.*;
 /**
  * A class for playing the game Othello.
  * 
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
+
  */
 public class Othello {
     private OthelloPlayer player1;

@@ -29,6 +29,7 @@ public final class HumanOthelloPlayer extends OthelloPlayer {
         nextMove = square;
     }
 
+    // Task: Make this as web socket communcating through chosen e4-e5
     /**
      * Returns the next move as input by the human from the UI. Note that this
      * function will block until the UI makes a call to

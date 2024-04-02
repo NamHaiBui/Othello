@@ -1,17 +1,9 @@
-// package edu.drexel.cs.ai.othello;
-
 import java.util.jar.*;
 import java.util.*;
 import java.io.File;
 //import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 
-/**
- * Various utility functions for finding and instantiating classes.
- * 
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
- */
 class ClassCreator {
     /**
      * Returns the Class object associated with the name of a class. This is
