@@ -1,3 +1,7 @@
+package MinimaxAI;
+
+import Othello.GameState;
+
 /**
  * A few methods that the MiniMax and AlphaBeta players
  * must implement.

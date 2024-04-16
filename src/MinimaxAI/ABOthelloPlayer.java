@@ -1,5 +1,8 @@
+package MinimaxAI;
 import java.util.AbstractSet;
 import java.util.Date;
+
+import Othello.*;
 
 
 public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
@@ -177,6 +180,7 @@ public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
 		branchingFactor = (exploredNodes - 1) /numNonTerminal; // Minus 1 is minus the root
 		return branchingFactor;
 	}
+	
 	
 	
 	

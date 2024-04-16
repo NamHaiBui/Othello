@@ -1,5 +1,8 @@
+package MinimaxAI;
 
 import java.util.Date;
+
+import Othello.*;
 
 
 public class NTOthelloPlayer extends OthelloPlayer implements MiniMax{
@@ -229,7 +232,5 @@ public class NTOthelloPlayer extends OthelloPlayer implements MiniMax{
 		branchingFactor = (exploredNodes - 1) /numNonTerminal; // Minus 1 is minus the root
 		return branchingFactor;
 	}
-	
-	
 	
 }

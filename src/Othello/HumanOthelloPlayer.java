@@ -1,3 +1,4 @@
+package Othello;
 // package edu.drexel.cs.ai.othello;
 
 import java.util.Date;

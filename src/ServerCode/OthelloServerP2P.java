@@ -1,22 +1,31 @@
-package Server;
+package ServerCode;
 
 import java.io.*;
 import java.net.*;
+import java.net.*;
+import java.util.Scanner;
 
-public class OthelloServer {
-	private String ip =" localhost";
-	private int port = 8888;
-	
-	private  Thread thread;
+
+public class OthelloServerP2P {
+	private String ip = "localhost";
+	private int port = 22222;
+	private Scanner scanner = new Scanner(System.in);
+
+	private Thread thread;
+
+
 	private Socket socket;
-	private DataInputStream dis;
 	private DataOutputStream dos;
-	
+	private DataInputStream dis;
+
 	private ServerSocket serverSocket;
-	
-	private boolean accepted = false;
+
 	private boolean yourTurn = false;
-	private boolean black = true;
+	private boolean accepted = false;
+	private boolean unableToCommunicateWithOpponent = false;
+/**
+ * 
+ */
 	private void listenForServerRequest() {
 		Socket socket = null;
 		try {
@@ -51,6 +60,9 @@ public class OthelloServer {
 			e.printStackTrace();
 		}
 		yourTurn = true;
-		black = false;
+	}
+	public static void main(String[] args) {
+		// Initialize an instance of Othello with 2 Human Players
+		
 	}
 }

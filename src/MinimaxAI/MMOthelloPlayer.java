@@ -1,5 +1,8 @@
+package MinimaxAI;
 import java.util.AbstractSet;
 import java.util.Date;
+
+import Othello.*;
 
 
 public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{

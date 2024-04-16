@@ -1,9 +1,4 @@
-// package edu.drexel.cs.ai.othello;
-
-/**
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
- */
+package Othello;
 public interface UserInterface {
     /**
      * Callback function for receiving updates to the state of the game.

@@ -1,3 +1,4 @@
+package Othello;
 import java.util.*;
 import java.math.BigInteger;
 //import java.security.SecureRandom;

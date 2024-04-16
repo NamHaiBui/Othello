@@ -1,3 +1,4 @@
+package Othello;
 import java.util.jar.*;
 import java.util.*;
 import java.io.File;

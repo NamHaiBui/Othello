@@ -1,3 +1,4 @@
+package Othello;
 // package edu.drexel.cs.ai.othello;
 
 // import java.util.HashSet;
@@ -5,6 +6,9 @@
 // import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
+
+import MinimaxAI.MiniMax;
+
 import java.lang.reflect.*;
 
 /**
