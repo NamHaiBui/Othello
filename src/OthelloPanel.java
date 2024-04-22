@@ -7,7 +7,6 @@ import java.awt.event.*;
 class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener {
 
     private static final long serialVersionUID = 1L;
-    
     private GameState state;
     private Square highlight;
     private boolean mousePresent;
@@ -35,7 +34,11 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
     private boolean isHumansTurn() {
         return ((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanOthelloPlayer);
     }
+    private boolean isHumansP2PTurn() {
+        return ((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanP2PPlayer);
+    }
 
+    
     public void paint(Graphics graphics) {
         int height = getHeight();
         int width = getWidth();
@@ -81,9 +84,17 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
                     }
                 }
             }
+//			if(!state.getConnectionStatus()) {
+//				g.setColor(Color.RED);
+//				g.setFont( new Font("Verdana", Font.BOLD, 32));
+//				Graphics2D g2 = (Graphics2D) g;
+//				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//				int stringWidth = g2.getFontMetrics().stringWidth("Waiting for another player");
+//				g.drawString("Waiting for another player", WIDTH / 2 - stringWidth / 2, HEIGHT / 2);
+//			}
         }
 
-        if (isHumansTurn()) {
+        if (isHumansTurn()|| (isHumansP2PTurn() && state.yourTurn())) {
             /*
              * Now, highlight the valid moves:
              */
@@ -99,13 +110,14 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
                     }
                 }
             }
-
+            
             if (mousePresent) {
                 g.setColor(trans_blue);
                 g.fillRect(highlight.col * square_width + highlight.col, highlight.row
                         * square_height + highlight.row, square_width + 1, square_height + 1);
             }
         }
+        
 
         g.setFont(legendFont);
 
@@ -168,14 +180,19 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
                         : player2);
                 hop.handleUIInput(mouseCoordsToRowCol(event));
             }
+            if (isHumansP2PTurn() && state.yourTurn()) {
+                HumanP2PPlayer hop = (HumanP2PPlayer) (state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1
+                        : player2);
+                hop.handleUIInput(mouseCoordsToRowCol(event));
+            }
             mouseClickThread = null;
         }
     }
 
     MouseClickThread mouseClickThread;
-
+    // Check if it is your turn?
     public void mouseClicked(MouseEvent e) {
-        if (isHumansTurn() && mouseClickThread == null) {
+        if ((isHumansTurn()|| (isHumansP2PTurn() && state.yourTurn())) && mouseClickThread == null) {
             mouseClickThread = new MouseClickThread(e);
             mouseClickThread.start();
         }

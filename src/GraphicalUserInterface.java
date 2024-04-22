@@ -1,4 +1,3 @@
-// package edu.drexel.cs.ai.othello;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -8,10 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-/**
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
- */
 public class GraphicalUserInterface extends JFrame implements UserInterface, Logger {
     
     private static final long serialVersionUID = 1;
@@ -42,7 +37,7 @@ public class GraphicalUserInterface extends JFrame implements UserInterface, Log
      * Constructs a new <code>GraphicalUserInterface</code>.
      */
     public GraphicalUserInterface() {
-        super("Drexel University Intro. AI Othello Game");
+        super("Nam Bui & Ha Othello Game expanded on Drexel University Othello Game");
         player1 = null;
         player2 = null;
         panel = null;
@@ -229,7 +224,8 @@ public class GraphicalUserInterface extends JFrame implements UserInterface, Log
             else if (source instanceof Exception)
                 attributes = err;
             try {
-//                insertString(logArea.getText().length(), message, attributes);
+                insertString(0, message, attributes);
+                
             }
             catch (Exception e) {
                 e.printStackTrace();

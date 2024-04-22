@@ -1,5 +1,3 @@
-// package edu.drexel.cs.ai.othello;
-
 import java.util.*;
 import java.math.BigInteger;
 //import java.security.SecureRandom;
@@ -9,11 +7,14 @@ import java.math.BigInteger;
  * board state and current player. This class also includes utilities such as a
  * successor function.
  * 
- * @author <a href="http://www.sultanik.com" target="_blank">Evan A.
- *         Sultanik</a>
+
  */
 public class GameState implements Cloneable {
+	
+	private boolean isMultiplayed;
+	private Player coreP2PPlayer;
     private Player player;
+    private boolean connected;
     private GameState previous;
     private Square move;
     private Random random;
@@ -85,10 +86,19 @@ public class GameState implements Cloneable {
      * seeded to a random value.
      */
     public GameState() {
+    	random = new Random();
+        init();
+    }
+    
+    public GameState(boolean isMultiplayed, boolean connected) {
+    	if (isMultiplayed) {
+    		this.isMultiplayed = isMultiplayed;
+    		this.connected = connected;
+    	}
         random = new Random();
         init();
     }
-
+    
     /**
      * Creates a new GameState with the initial board configuration, a random
      * initial player, and the random number generator seeded to the given
@@ -98,13 +108,31 @@ public class GameState implements Cloneable {
         random = new Random(randomNumberGeneratorSeed);
         init();
     }
-
+    public GameState(long randomNumberGeneratorSeed, boolean isMultiplated, boolean connected) {
+    	if (isMultiplated) {
+    		this.isMultiplayed = isMultiplated;
+    		this.connected = connected;
+    	}
+    	random = new Random(randomNumberGeneratorSeed);
+        init();
+    }
     private void init() {
         board = new Player[8][8];
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++)
                 board[i][j] = Player.EMPTY;
-        player = (random.nextInt(2) == 0 ? Player.PLAYER1 : Player.PLAYER2);
+        if (isMultiplayed) {
+        	player = Player.PLAYER1;
+//        	(!connected ? Player.PLAYER1 : Player.PLAYER2)
+        	coreP2PPlayer = (!connected ? Player.PLAYER1 : Player.PLAYER2);
+        	board[3][3] = Player.PLAYER1;
+            board[3][4] = Player.PLAYER2;
+            board[4][3] = Player.PLAYER2;
+            board[4][4] = Player.PLAYER1;
+        }
+        else {
+        	player = (random.nextInt(1) == 0 ? Player.PLAYER1 : Player.PLAYER2);	
+        
         if (player == Player.PLAYER2) {
             board[3][3] = Player.PLAYER1;
             board[3][4] = Player.PLAYER2;
@@ -116,6 +144,7 @@ public class GameState implements Cloneable {
             board[3][4] = Player.PLAYER1;
             board[4][3] = Player.PLAYER1;
             board[4][4] = Player.PLAYER2;
+        }
         }
         previous = null;
         move = null;
@@ -137,7 +166,11 @@ public class GameState implements Cloneable {
         for (int i = 0; i < 8; i++)
             for (int j = 0; j < 8; j++)
                 gs.board[i][j] = board[i][j];
+        gs.connected = connected;
+        gs.isMultiplayed = isMultiplayed;
+        gs.coreP2PPlayer = coreP2PPlayer;
         gs.player = player;
+        gs.connected = connected;
         gs.previous = previous;
         gs.move = move;
         gs.random = random;
@@ -149,14 +182,21 @@ public class GameState implements Cloneable {
         gs.hash = hash;
         return gs;
     }
-
+    public void updateConnectionStatus(boolean connection) {
+    	connected = connection;
+    }
+    public boolean getConnectionStatus() {
+    	return connected;
+    }
     /**
      * Returns the player whose turn it is to make a move.
      */
     public Player getCurrentPlayer() {
         return player;
     }
-
+    public boolean yourTurn() {
+    	return coreP2PPlayer == player;
+    }
     /**
      * Returns the random number generator for this game.
      */
@@ -192,7 +232,9 @@ public class GameState implements Cloneable {
     public Player getSquare(Square square) {
         return getSquare(square.row, square.col);
     }
-
+    public boolean getIsMultiplayed() {
+    	return isMultiplayed;
+    }
     Square wouldFlip(Square move, Player player, Direction direction) {
         int row = move.row;
         int col = move.col;
