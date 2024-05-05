@@ -108,10 +108,17 @@ public class Othello {
 
     private void init(OthelloPlayer player1, OthelloPlayer player2, UserInterface ui, long seed,
             boolean useSeed) {
+        
+    	boolean isMultiplayed = (player1 instanceof HumanP2PPlayer && player2 instanceof HumanP2PPlayer);
+        if ((player1 instanceof HumanP2PPlayer && !( player2 instanceof HumanP2PPlayer))) {
+    		player1 = new HumanOthelloPlayer(player1.getName());
+    	}else if((!(player1 instanceof HumanP2PPlayer) && ( player2 instanceof HumanP2PPlayer))) {
+    		player2 = new HumanOthelloPlayer(player2.getName());
+    	}
         this.player1 = player1;
         this.player2 = player2;
-        boolean isMultiplayed = (player1 instanceof HumanP2PPlayer && player2 instanceof HumanP2PPlayer);
-    	if (isMultiplayed) {
+
+        if (isMultiplayed) {
 	    	System.out.println("Please input the IP: ");
 			ip = scanner.nextLine();
 			System.out.println("Please input the port: ");
@@ -261,7 +268,7 @@ public class Othello {
             do {
                 validMove = true;
                 Square move = null;
-                if (player instanceof HumanOthelloPlayer) {
+                if (!state.getIsMultiplayed() && (player instanceof HumanOthelloPlayer || player instanceof HumanP2PPlayer)) {
                     ui.updateTimeRemaining(player, -1);
                     Date start = new Date();
                     move = player.getMoveInternal(state, null);
@@ -280,14 +287,14 @@ public class Othello {
 	                        ui.updateTimeUsed(player, p2timeUsed);
 	                    }
             		}
-                else if ((player instanceof HumanP2PPlayer)) {
+                else if (state.getIsMultiplayed() &&( player instanceof HumanP2PPlayer)) {
                 	if(state.yourTurn()) {
                 	ui.updateTimeRemaining(player, -1);
                     Date start = new Date();
                     
                     move = player.getMoveInternal(state, null);
 //                    Random mover
-                    Square moves[] = state.getValidMoves().toArray(new Square[0]);
+//                    Square moves[] = state.getValidMoves().toArray(new Square[0]);
 //                    int next = state.getRandom().nextInt(moves.length);
 //                    log("Randomly moving " + player.getName() + " to " + moves[next].toString()
 //                            + "...");
@@ -339,6 +346,9 @@ public class Othello {
                 			nextMove = new Square(nextString);
                 		}
                 	}
+                	else if (errors > 10){
+                		log("Failed to connect");
+                	}
                 	else {
                 		nextMove = move;
 
@@ -348,6 +358,8 @@ public class Othello {
                 		dos.flush();
                 	}
                     }
+                	}else {
+                		nextMove = move;
                 	}
                 	state = state.applyMove(nextMove);
                 }
@@ -499,6 +511,7 @@ public class Othello {
                 player2name = player2name + "2";
             else if (player2name.equals(""))
                 player2name = "Player 2";
+            
             try {
                 players[0] = instantiatePlayer(player1class, player1name);
             }
@@ -533,7 +546,7 @@ public class Othello {
             printUsage();
             System.exit(1);
         }
-
+        
         ui.setPlayers(players[0], players[1]);
         if (ui instanceof Logger) {
             players[0].setLogger((Logger) ui);
@@ -547,7 +560,7 @@ public class Othello {
         else
             othello = new Othello(players[0], players[1], ui);
         
-        othello.turnDuration = turnDuration;
+//        othello.turnDuration = turnDuration;
         if (ui instanceof Logger)
             ((Logger) ui).log(getVersionInfo(), null);
         else

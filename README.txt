@@ -7,8 +7,8 @@ Play a classic game of Othello (Reversi) over a local network against another hu
 ## Features
 
 * Two-player gameplay over a local network
-* Standard Othello rules
-* Clear board display
+* Standard Othello rules 
+* Clear board display 
 
 ## Installation
 
@@ -17,15 +17,11 @@ Play a classic game of Othello (Reversi) over a local network against another hu
 * [Java]
 
 **Instructions**
-
 1. Clone the repository:
-
    ```bash
    git clone https://github.com/NamHaiBui/Othello.git
    ```
-
 2. Navigate to the project directory:
-
    ```bash
    cd Othello
    ```

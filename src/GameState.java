@@ -195,6 +195,7 @@ public class GameState implements Cloneable {
         return player;
     }
     public boolean yourTurn() {
+//    	System.out.println(coreP2PPlayer == player);
     	return coreP2PPlayer == player;
     }
     /**

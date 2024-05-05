@@ -2,7 +2,7 @@ import java.util.AbstractSet;
 import java.util.Date;
 
 
-public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
+public class ABOthelloPlayer extends OthelloPlayer implements MiniMax{
 	// This field set our maximum depth limit.
 	private int depthLimit;
 	// initialize the number of generated nodes : integer.
@@ -19,18 +19,18 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
 	private double branchingFactor = 1;
 	
 
-	// Constructor for MniMax Player. Initial depth limit is set to a constant.
-	public MMOthelloPlayer(String name) {
+    // Constructor for Alpha Beta Player. Initial depth limit is set to a constant.
+	public ABOthelloPlayer(String name) {
 		super(name);
 		depthLimit = 5;
 	}
-	// Constructor for MiniMax Player with given depth limit.
-	public MMOthelloPlayer(String name, int _depthLimit) {
+    // Constructor for MiniMax Player with given depth limit.
+	public ABOthelloPlayer(String name, int _depthLimit) {
 		super(name);
 		depthLimit = _depthLimit;
 	}
 
-	 /**
+     /**
      * The getMove function for this player.  This function
      * will return the best move.
      * 
@@ -42,42 +42,44 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
 	@Override
 	public Square getMove(GameState currentState, Date deadline) {
         Square moves[] = currentState.getValidMoves().toArray(new Square[0]);
-		
-		// This store the best move value of the current board.
+        
+        // This store the best move value of the current board.
 		int bestValue = Integer.MIN_VALUE;
 		// This store the next move
         Square nextMove = null;
 
-        for(Square _move : moves) {
-			generatedNodes++;
+        for (Square _move: moves) {
+            generatedNodes++;
+            
+            // We want the role of MAX Player, so we want to find all the MIN child -> isMAX is false.
+            int moveValue = alphaBeta(depthLimit, currentState.applyMove(_move), Integer.MIN_VALUE, Integer.MAX_VALUE, false);
 
-			// We want the role of MAX Player, so we want to find all the MIN child -> isMAX is false.
-        	int moveValue = miniMax(depthLimit, currentState.applyMove(_move),false);
-    		
-			if(moveValue > bestValue) {
-    			bestValue = moveValue;
-    			nextMove = _move;
-    		};
+            if (moveValue > bestValue) {
+            	bestValue = moveValue;
+                nextMove = _move;
+            };
         }
 		return nextMove;
 	}
 
-
-	//**************************    MiniMax Search algo ************************* 
+	//**************************    Alpha-Beta Pruning Search algo ************************* 
 	/**
      * The getMove function for this player.  This function
      * will return the best move.
      * 
      * @param depth the current depth of the node.
 	 * @param currentState the current state of the board.
+     * @param alpha the value of best alternatives for MAX player along the path.
+     * @param beta the value of best alternatives for MIN player along the path.
 	 * @param isMax if this is the Max Player then true.
      * @return the int value whose best move is calculated.
      */
 
-	public int miniMax(int depth, GameState currentState,boolean isMax) {
-		Square possibleMoves[] = currentState.getValidMoves().toArray(new Square[0]);
-		
-		// if depth = 0 or node is a terminal node.
+
+    public int alphaBeta (int depth, GameState currentState, int alpha, int beta, boolean isMax) {
+    	Square possibleMoves[] = currentState.getValidMoves().toArray(new Square[0]);
+    	
+        // if depth = 0 or node is a terminal node.
 		if(depth == 0 || possibleMoves.length == 0) {
 			return staticEvaluator(currentState);
 		} else { 
@@ -85,27 +87,32 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
 			generatedNodes += possibleMoves.length; // the number of child is generated.
 		}
 
-		if (isMax) {
+        if (isMax) {
 			int v = Integer.MIN_VALUE;
-			for(Square _move: possibleMoves) {	
-				exploredNodes++;
-				//Recursively search the new game state		
-				v = Integer.min(v, miniMax(depth - 1, currentState.applyMove(_move), false));
-			}
-			return v;
+            for(Square _move: possibleMoves) {
+            	exploredNodes++;
+                //Recursively search the new game state
+                v = Integer.max(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, false));
+                
+                
+                if ( v >= beta) break; // beta cut off
+                alpha = Integer.max(alpha, v);
+            }
+            return v;
+
 		} else {
-			int v = Integer.MAX_VALUE;		
-			for(Square _move: possibleMoves) {
-				exploredNodes++;
-				v = Integer.max(v, miniMax(depth - 1, currentState.applyMove(_move), true));
-			}
-			return v;
+			int v = Integer.MAX_VALUE;
+            for (Square _move: possibleMoves) {
+            	exploredNodes++;
+                v = Integer.min(v, alphaBeta(depth - 1, currentState.applyMove(_move), alpha, beta, true));
+                
+                if ( v <= alpha) break; // alpha cut off
+                beta = Integer.min(beta, v);
+            }
+            return v;      
         }
-	}
-	
-	
-	
-	 /**
+}
+ /**
      * The static evaluation function for your search.  This function
      * must be used by your MiniMax and AlphaBeta algorithms for all
      * static evaluations.  It is separated out so that it can be easily
@@ -114,16 +121,18 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
      * @param state the state to be evaluated.
      * @return an integer score for the value of the state to the max player.
      */
+    
 	@Override
 	public int staticEvaluator(GameState state) {
-		staticEvaluationsComputed++;
+        staticEvaluationsComputed++;
+        // Set the heristic value equal to the the score of current player.
 		return state.getScore(state.getCurrentPlayer());
 	}
-	 /**
-     * Get the number of nodes that were
-     * generated during the search.
+	/**
+     * Get the number of nodes that were generated
+     * during the search.
      * 
-     * @return the number of generatedNodes.
+     * @return the number of nodes generated.
      */
 	@Override
 	public int getNodesGenerated() {
@@ -168,6 +177,7 @@ public class MMOthelloPlayer extends OthelloPlayer implements MiniMax{
 		branchingFactor = (exploredNodes - 1) /numNonTerminal; // Minus 1 is minus the root
 		return branchingFactor;
 	}
+	
 	
 	
 	

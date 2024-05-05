@@ -18,6 +18,11 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
         state = initialState;
         highlight = new Square(0, 0);
         mousePresent = false;
+        if ((player1 instanceof HumanP2PPlayer && !( player2 instanceof HumanP2PPlayer))) {
+    		player1 = new HumanOthelloPlayer(player1.getName());
+    	}else if((!(player1 instanceof HumanP2PPlayer) && ( player2 instanceof HumanP2PPlayer))) {
+    		player2 = new HumanOthelloPlayer(player2.getName());
+    	}
         this.player1 = player1;
         this.player2 = player2;
         addMouseListener(this);
@@ -32,10 +37,12 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
     }
 
     private boolean isHumansTurn() {
-        return ((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanOthelloPlayer);
+    	boolean check =((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanOthelloPlayer);
+    	return check;
     }
     private boolean isHumansP2PTurn() {
-        return ((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanP2PPlayer);
+        boolean check = ((state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1 : player2) instanceof HumanP2PPlayer);
+        return check;
     }
 
     
@@ -94,7 +101,7 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
 //			}
         }
 
-        if (isHumansTurn()|| (isHumansP2PTurn() && state.yourTurn())) {
+        if (isHumansTurn() || (isHumansP2PTurn() && state.yourTurn())) {
             /*
              * Now, highlight the valid moves:
              */
@@ -180,7 +187,7 @@ class OthelloPanel extends JPanel implements MouseListener, MouseMotionListener 
                         : player2);
                 hop.handleUIInput(mouseCoordsToRowCol(event));
             }
-            if (isHumansP2PTurn() && state.yourTurn()) {
+            else if (isHumansP2PTurn() && state.yourTurn()) {
                 HumanP2PPlayer hop = (HumanP2PPlayer) (state.getCurrentPlayer() == GameState.Player.PLAYER1 ? player1
                         : player2);
                 hop.handleUIInput(mouseCoordsToRowCol(event));

@@ -48,6 +48,7 @@ public class GraphicalUserInterface extends JFrame implements UserInterface, Log
     }
 
     public void setPlayers(OthelloPlayer player1, OthelloPlayer player2) {
+
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -192,6 +193,11 @@ public class GraphicalUserInterface extends JFrame implements UserInterface, Log
     public OthelloPlayer[] getPlayers() {
         //OthelloPlayer players[] = new OthelloPlayer[2];
         GameSelectorDialog gsd = new GameSelectorDialog(this);
+        if ((gsd.player1 instanceof HumanP2PPlayer && !( gsd.player2 instanceof HumanP2PPlayer))) {
+        	gsd.player1 = new HumanOthelloPlayer(gsd.player1.getName());
+    	}else if((!(gsd.player1 instanceof HumanP2PPlayer) && ( gsd.player2 instanceof HumanP2PPlayer))) {
+    		gsd.player2 = new HumanOthelloPlayer(gsd.player2.getName());
+    	}
         return new OthelloPlayer[] { gsd.player1, gsd.player2 };
     }
 
